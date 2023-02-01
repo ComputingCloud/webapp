@@ -23,24 +23,22 @@ public class UserInfoController {
     //Post Method input json can be parsed to the UserInfo Object
     @PostMapping("/v1/user")
     
-    public ResponseEntity<?> addUser(@Validated @RequestBody UserInfo newUser, Errors error)  {
+    public ResponseEntity<?> addUser(@Validated @RequestBody UserInfo newUser, Errors error) {
         System.out.println(newUser);
-        try{
-            if(error.hasErrors()){
+        try {
+            if (error.hasErrors()) {
                 String response = error.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(", "));
                 throw new InvalidUserInputException(response);
             }
-            return new ResponseEntity<>(service.saveUser(newUser),HttpStatus.CREATED);
+            return new ResponseEntity<>(service.saveUser(newUser), HttpStatus.CREATED);
         } catch (InvalidUserInputException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }catch (UserExistException e) {
+        } catch (UserExistException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        catch (Exception e){
-            return new ResponseEntity<>("",HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
+    }
 
 
     //Get API with UserId
