@@ -2,6 +2,7 @@ package com.example.assignment1.service;
 
 import com.example.assignment1.Exception.DataNotFoundException;
 import com.example.assignment1.Exception.UserExistException;
+
 import com.example.assignment1.entity.UserInfo;
 import com.example.assignment1.repository.UserRepository;
 import com.example.assignment1.repository.UserRepository;
@@ -17,6 +18,7 @@ public class UserService {
     UserRepository repository;
 
 //Post method to save info in Database
+
     public UserInfo saveUser(UserInfo userinfo) throws UserExistException {
 
        UserInfo userObj= repository.findByEmailID(userinfo.getEmailID());

@@ -14,7 +14,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.stream.Collectors;
-
 @RestController
 public class UserInfoController {
 
@@ -23,6 +22,7 @@ public class UserInfoController {
 
     //Post Method input json can be parsed to the UserInfo Object
     @PostMapping("/v1/user")
+    
     public ResponseEntity<?> addUser(@Validated @RequestBody UserInfo newUser, Errors error)  {
         System.out.println(newUser);
         try{
@@ -41,7 +41,7 @@ public class UserInfoController {
             return new ResponseEntity<>("",HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-    }
+
 
     //Get API with UserId
     @GetMapping("/v1/user/{id}")
@@ -49,6 +49,7 @@ public class UserInfoController {
         try {
             if(id == 0){
             throw new InvalidUserInputException("Enter Valid Input");
+
             }
 
 
@@ -77,6 +78,7 @@ public class UserInfoController {
 
         try {
             UserInfo existingUserInfo = service.getUserById(id);//Select the user mentioned based on the ID Field
+
             existingUserInfo.setFName(newUser.getFName());
             existingUserInfo.setLName(newUser.getLName());
            // existingUserInfo.setPassword(newUser.getPassword());
