@@ -1,13 +1,19 @@
 package com.example.assignment1.controller;
 
 import com.example.assignment1.Exception.DataNotFoundException;
-import com.example.assignment1.Exception.InvalidUserInput;
+import com.example.assignment1.Exception.InvalidUserInputException;
+import com.example.assignment1.Exception.UserExistException;
 import com.example.assignment1.entity.UserInfo;
 import com.example.assignment1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
 
 @RestController
 public class UserInfoController {
@@ -17,9 +23,24 @@ public class UserInfoController {
 
     //Post Method input json can be parsed to the UserInfo Object
     @PostMapping("/v1/user")
-    UserInfo addUser(@RequestBody UserInfo newUser) {
+    public ResponseEntity<?> addUser(@Validated @RequestBody UserInfo newUser, Errors error)  {
         System.out.println(newUser);
-        return service.saveUser(newUser);
+        try{
+            if(error.hasErrors()){
+                String response = error.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(", "));
+                throw new InvalidUserInputException(response);
+            }
+            return new ResponseEntity<>(service.saveUser(newUser),HttpStatus.CREATED);
+        } catch (InvalidUserInputException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }catch (UserExistException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        catch (Exception e){
+            return new ResponseEntity<>("",HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     //Get API with UserId
@@ -27,7 +48,7 @@ public class UserInfoController {
     public ResponseEntity<?> getUserById(@PathVariable int id) {
         try {
             if(id == 0){
-            throw new InvalidUserInput("Enter Valid Input");
+            throw new InvalidUserInputException("Enter Valid Input");
             }
 
 
@@ -37,7 +58,7 @@ public class UserInfoController {
             return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
         }
 
-        catch(InvalidUserInput e){
+        catch(InvalidUserInputException e){
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
@@ -55,7 +76,7 @@ public class UserInfoController {
     public ResponseEntity<?> updateUser(@RequestBody UserInfo newUser, @PathVariable int id) throws DataNotFoundException{
 
         try {
-            UserInfo existingUserInfo = service.getUserById(id);//Select the user mentioned based on the Id Field
+            UserInfo existingUserInfo = service.getUserById(id);//Select the user mentioned based on the ID Field
             existingUserInfo.setFName(newUser.getFName());
             existingUserInfo.setLName(newUser.getLName());
            // existingUserInfo.setPassword(newUser.getPassword());
