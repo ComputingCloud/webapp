@@ -1,12 +1,11 @@
 package com.example.assignment1.repository;
 
-import com.example.assignment1.entity.UserInfo;
+import com.example.assignment1.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface UserRepository extends JpaRepository<UserInfo,Integer> {
-    UserInfo findByEmailID(String name);
-//    UserInfo findByEmail(String email)
+import java.util.UUID;
 
+public interface UserRepository extends JpaRepository<User,UUID> {
+
+	User findByUsername(String username);
 }
