@@ -1,79 +1,76 @@
 package com.example.assignment1.service;
 
-import com.example.assignment1.Exception.DataNotFoundException;
-import com.example.assignment1.Exception.UserExistException;
+import java.util.Optional;
+import java.util.UUID;
 
-import com.example.assignment1.entity.UserInfo;
-import com.example.assignment1.repository.UserRepository;
+import com.example.assignment1.exeception.DataNotFoundExeception;
+import com.example.assignment1.exeception.UserAuthrizationExeception;
+import com.example.assignment1.exeception.UserExistException;
+import com.example.assignment1.model.User;
+import com.example.assignment1.model.UserDto;
+import com.example.assignment1.model.UserUpdateRequestModel;
 import com.example.assignment1.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+
 
 @Service
 public class UserService {
-    @Autowired
-    UserRepository repository;
 
-//Post method to save info in Database
+	@Autowired
+	UserRepository userrepo;
 
-    public UserInfo saveUser(UserInfo userinfo) throws UserExistException {
+	@Bean
+	public BCryptPasswordEncoder encoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-       UserInfo userObj= repository.findByEmailID(userinfo.getEmailID());
-       if(userObj!=null){
-           throw new UserExistException("User Already Exists");
-       }
-        userinfo.setId(userinfo.getId());
-        userinfo.setFName(userinfo.getFName());
-        userinfo.setLName(userinfo.getLName());
-        userinfo.setEmailID(userinfo.getEmailID());
-        userinfo.setPassword(new BCryptPasswordEncoder().encode(userinfo.getPassword()));
-        System.out.println(userinfo);
-        return repository.save(userinfo);
-    }
-    public List<UserInfo> saveUsers(List<UserInfo> usersinfo){
+	public String createUser(User user) throws UserExistException {
+		User userDto = userrepo.findByUsername(user.getUsername());
+		if (userDto == null) {
+			user.setPassword(encoder().encode(user.getPassword()));
+			userrepo.save(user);
+			return "Created User";
+		}
+		throw new UserExistException("User Exists Already");
+	}
 
-        return repository.saveAll(usersinfo);
-    }
+	public UserDto getUserDetails(UUID userId) throws DataNotFoundExeception {
+		Optional<User> user = userrepo.findById(userId);
+		if (user.isPresent()) {
+			UserDto dto = UserDto.getUserDto(user.get());
+			return dto;
+		}
+		throw new DataNotFoundExeception("User Not Found");
+	}
 
-    //To get the User info from Database
-    public List<UserInfo> getUsers(){
-        return repository.findAll();
-    }
-    //Get user info by ID
-    public UserInfo getUserById(int id) throws DataNotFoundException {
+	public String updateUserDetails(UUID userId, UserUpdateRequestModel user) throws DataNotFoundExeception, UserAuthrizationExeception {
+		Optional<User> userObj = userrepo.findById(userId);
+		if (userObj.isPresent()) {
+			if(!userObj.get().getUsername().equals(user.getUsername()))
+				throw new UserAuthrizationExeception("Forbidden to Update Data");
+			User dto = userObj.get();
+			dto.setFirstName(user.getFirstName());
+			dto.setLastName(user.getLastName());
+			dto.setPassword(encoder().encode(user.getPassword()));
+			dto.setUsername(user.getUsername());
+			userrepo.save(dto);
+			return "Updated User Details Successfully";
 
-        UserInfo userInfo = repository.findById(id).orElse(null);
-        if(userInfo!=null){
-            return userInfo;
-        }
-        throw new DataNotFoundException("Data Not Found");
+		}
+		throw new DataNotFoundExeception("User Not Found");
+	}
 
-    }
-    /*public UserInfo getUserByEmailId(String name) {
-        return repository.findByEmailID(name);
-    }*/
+	public User loadUserByUsername(String username) {
+		// TODO Auto-generated method stub
+		User user = userrepo.findByUsername(username);
+		if (user == null) {
+			return null;
+		}
+		return user;
+	}
 
-    /*public UserInfo getUserByEmail(String email){
-        return repository.findByEmail(email);
-    }*/
-//method for deleting the User
-    public String deleteUser(int id){
-        repository.deleteById(id);
-        return "User Removed!!" + id;
-    }
-
-    //Method to update
-
-    public UserInfo updateUserInfo(UserInfo userInfo){
-        UserInfo existingUserInfo = repository.findById(userInfo.getId()).orElse(null);
-        existingUserInfo.setFName(userInfo.getFName());
-        existingUserInfo.setLName(userInfo.getLName());
-      //  userinfo.setPassword(new BCryptPasswordEncoder().encode(userinfo.getPassword()));
-        existingUserInfo.setPassword(new BCryptPasswordEncoder().encode(userInfo.getPassword()));
-        return repository.save(existingUserInfo);
-
-    }
 }
