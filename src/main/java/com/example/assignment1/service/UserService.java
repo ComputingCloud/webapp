@@ -38,7 +38,7 @@ public class UserService {
 		throw new UserExistException("User Exists Already");
 	}
 
-	public UserDto getUserDetails(UUID userId) throws DataNotFoundExeception {
+	public UserDto getUserDetails(Integer userId) throws DataNotFoundExeception {
 		Optional<User> user = userrepo.findById(userId);
 		if (user.isPresent()) {
 			UserDto dto = UserDto.getUserDto(user.get());
@@ -47,7 +47,7 @@ public class UserService {
 		throw new DataNotFoundExeception("User Not Found");
 	}
 
-	public String updateUserDetails(UUID userId, UserUpdateRequestModel user) throws DataNotFoundExeception, UserAuthrizationExeception {
+	public String updateUserDetails(Integer userId, UserUpdateRequestModel user) throws DataNotFoundExeception, UserAuthrizationExeception {
 		Optional<User> userObj = userrepo.findById(userId);
 		if (userObj.isPresent()) {
 			if(!userObj.get().getUsername().equals(user.getUsername()))
