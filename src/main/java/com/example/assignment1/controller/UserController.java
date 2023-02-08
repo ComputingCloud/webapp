@@ -39,7 +39,7 @@ public class UserController {
 	
 	
     @GetMapping(value = "/user/{userId}")
-    public ResponseEntity<?> getUserDetails(@PathVariable("userId") UUID userId, HttpServletRequest request){
+    public ResponseEntity<?> getUserDetails(@PathVariable("userId") Integer userId, HttpServletRequest request){
     	try {
     		if(userId.toString().isBlank()||userId.toString().isEmpty()) {
             	throw new InvalidInputException("Enter Valid User Id");
@@ -65,7 +65,7 @@ public class UserController {
     }
     
     @PutMapping(value = "/user/{userId}")
-    public ResponseEntity<?> updateUserDetails(@PathVariable("userId") UUID userId, @Valid @RequestBody UserUpdateRequestModel user,
+    public ResponseEntity<?> updateUserDetails(@PathVariable("userId") Integer userId, @Valid @RequestBody UserUpdateRequestModel user,
     		HttpServletRequest request,Errors error){
     	try {
     		if(userId.toString().isBlank()||userId.toString().isEmpty()) {
