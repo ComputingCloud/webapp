@@ -15,9 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController()
@@ -33,6 +36,17 @@ public class ProductController {
     @Autowired
     AuthService authService;
 
+    @RestControllerAdvice
+    public class MyExceptionHandler {
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<String> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+            List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+            String errorMessage = fieldErrors.stream()
+                    .map(FieldError::getDefaultMessage)
+                    .collect(Collectors.joining(", "));
+            return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @PostMapping()
     public ResponseEntity<?> productCreate(@Valid @RequestBody Product product, Errors error, HttpServletRequest request) {
@@ -106,4 +120,56 @@ public class ProductController {
         }
 
     }
-}
+
+
+    @PatchMapping(value = "/{productId}")
+    public ResponseEntity<?> patchUser(@PathVariable("product") Integer productId, @Valid @RequestBody Product product, HttpServletRequest request, Errors error) {
+
+        try{
+            if(productId.toString().isBlank() || productId.toString().isEmpty()){
+                throw new InvalidInputException("Enter Valid Product Id");
+
+            }
+            authService.isAuthorised(productService.getProduct(productId).getOwnerUserId(),request.getHeader("Authorization").split(" ")[1]);
+            return new ResponseEntity<String>(productService.updateProduct(productId, product),
+                    HttpStatus.NO_CONTENT);
+        }
+        catch (InvalidInputException e){
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        catch (UserAuthrizationExeception e) {
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.FORBIDDEN);
+        } catch (DataNotFoundExeception e) {
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<String>(UserConstants.InternalErr, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @DeleteMapping(value = "/{productId}")
+    public ResponseEntity<?> deleteUser(@PathVariable("productId") Integer productId, HttpServletRequest request){
+        try{
+            if(productId.toString().isBlank() || productId.toString().isEmpty()){
+                throw new InvalidInputException("Enter Valid ProductID");
+
+            }
+            authService.isAuthorised(productService.getProduct(productId).getOwnerUserId(), request.getHeader("Authorization").split(" ")[1]);
+            return new ResponseEntity<String>(productService.deleteProduct(productId), HttpStatus.NO_CONTENT);
+
+        }catch (InvalidInputException e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (UserAuthrizationExeception e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.FORBIDDEN);
+        } catch (DataNotFoundExeception e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<String>(UserConstants.InternalErr, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    }

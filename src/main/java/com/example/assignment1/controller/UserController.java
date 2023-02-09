@@ -8,6 +8,7 @@ import com.example.assignment1.exeception.InvalidInputException;
 import com.example.assignment1.exeception.UserAuthrizationExeception;
 import com.example.assignment1.exeception.UserExistException;
 import com.example.assignment1.model.User;
+import com.example.assignment1.model.UserDto;
 import com.example.assignment1.model.UserUpdateRequestModel;
 import com.example.assignment1.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,7 +46,7 @@ public class UserController {
             	throw new InvalidInputException("Enter Valid User Id");
             }
     		authService.isAuthorised(userId,request.getHeader("Authorization").split(" ")[1]);
-			return new ResponseEntity<com.example.assignment1.model.UserDto>( userService.getUserDetails(userId),HttpStatus.OK);
+			return new ResponseEntity<UserDto>( userService.getUserDetails(userId),HttpStatus.OK);
 		} catch (InvalidInputException e) {
 			// TODO Auto-generated catch block
 			return new ResponseEntity<String>( e.getMessage(),HttpStatus.BAD_REQUEST);
