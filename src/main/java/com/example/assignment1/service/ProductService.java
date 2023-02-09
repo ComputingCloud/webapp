@@ -2,6 +2,7 @@ package com.example.assignment1.service;
 
 
 import com.example.assignment1.exeception.DataNotFoundExeception;
+import com.example.assignment1.exeception.InvalidInputException;
 import com.example.assignment1.exeception.UserAuthrizationExeception;
 import com.example.assignment1.model.Product;
 import com.example.assignment1.model.User;
@@ -21,14 +22,26 @@ public class ProductService {
     UserService userService;
 
 
-    public Product productCreate(Product product, String userName)throws UserAuthrizationExeception{
+    public Product productCreate(Product product, String userName) throws UserAuthrizationExeception, InvalidInputException {
         User userObj = userService.loadUserByUsername(userName);
         if(userObj != null){
+            skuCheck(1, userObj.getId(), product.getSku(), "PostCheck");
             product.setOwnerUserId(userObj.getId());
             productRepository.saveAndFlush(product);
             return product;
         }
         throw new UserAuthrizationExeception("Unauthorized Username, does not Exists");
+    }
+
+    public Product skuCheck(Integer id,Integer ownerId,String sku,String check) throws InvalidInputException {
+        Product p;
+        if(check.equals("PostCheck"))
+            p=productRepository.findProductByownerUserIdAndSku(ownerId,sku);
+        else
+            p=productRepository.checkProductSku( id,ownerId, sku);
+        if(p==null)
+            return p;
+        throw new InvalidInputException("SKU Value Exists already");
     }
 
 
@@ -59,7 +72,7 @@ public class ProductService {
         return "Details of the product updated";
     }
 
-    public String deleteProduct(Integer productId, Product product) throws DataNotFoundExeception {
+    public String deleteProduct(Integer productId) throws DataNotFoundExeception {
         Product prod = getProduct(productId);
         productRepository.deleteById(prod.getId());
 
