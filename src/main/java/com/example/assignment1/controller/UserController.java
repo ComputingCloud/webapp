@@ -11,6 +11,7 @@ import com.example.assignment1.model.User;
 import com.example.assignment1.model.UserDto;
 import com.example.assignment1.model.UserUpdateRequestModel;
 import com.example.assignment1.service.AuthService;
+import com.example.assignment1.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 	
 	@Autowired
-	com.example.assignment1.service.UserService userService;
+	UserService userService;
 	
 	@Autowired
 	AuthService authService;
@@ -69,7 +70,7 @@ public class UserController {
     public ResponseEntity<?> updateUserDetails(@PathVariable("userId") Integer userId, @Valid @RequestBody UserUpdateRequestModel user,
     		HttpServletRequest request,Errors error){
     	try {
-    		if(userId.toString().isBlank()||userId.toString().isEmpty()) {
+    		if(userId.toString().isBlank() || userId.toString().isEmpty()) {
             	throw new InvalidInputException("Enter Valid User Id");
             }
 			System.out.println(user);
@@ -99,14 +100,14 @@ public class UserController {
     }
     
     @PostMapping("/user")
-    public ResponseEntity<String> createUser(@Valid @RequestBody User user, Errors error){
+    public ResponseEntity<?> createUser(@Valid @RequestBody User user, Errors error){
     	try {
     		if(error.hasErrors()) {
     			String response = error.getAllErrors().stream().map(ObjectError::getDefaultMessage)
     					.collect(Collectors.joining(","));
     			throw new InvalidInputException(response);
     		}
-			return new ResponseEntity<String>( userService.createUser(user),HttpStatus.CREATED);
+			return new ResponseEntity<User>( userService.createUser(user), HttpStatus.CREATED);
 		} catch (InvalidInputException e) {
 			// TODO Auto-generated catch block
 			return new ResponseEntity<String>( e.getMessage(),HttpStatus.BAD_REQUEST);

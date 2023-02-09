@@ -10,6 +10,7 @@ import com.example.assignment1.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -72,12 +73,59 @@ public class ProductService {
         return "Details of the product updated";
     }
 
-    public String deleteProduct(Integer productId) throws DataNotFoundExeception {
+    public String patchProducts(Integer productId, Map<String,Object> updates) throws DataNotFoundExeception, InvalidInputException {
         Product prod = getProduct(productId);
-        productRepository.deleteById(prod.getId());
+
+        if(updates.size()==0){
+            throw new InvalidInputException("Request Should not be empty");
+        }
+        for(Map.Entry<String, Object> map : updates.entrySet()){
+            switch(map.getKey()){
+                case "pName":
+                    String name= (String) map.getValue();
+                    if(name.isBlank() || name.isEmpty() || name == null)
+                        throw new InvalidInputException("Prduct name cannot be empty");
+                    else
+                        prod.setPName(name);
+                    break;
+                case "pDescription" :
+                    String description = (String) map.getValue();
+                    if(description.isBlank() || description.isEmpty())
+                        throw new InvalidInputException("Description cannot be empty");
+                    prod.setPDescription(description);
+                    break;
+                case "sku":
+                    String sku = (String) map.getValue();
+                    if (sku.isBlank() || sku.isEmpty()||sku==null)
+                        throw new InvalidInputException("Product SKU can't be null/empty");
+                    skuCheck(prod.getId(), prod.getOwnerUserId(), sku, "PostCheck");
+                    prod.setSku(sku);
+                    break;
+                case "pManufacture":
+                    String manufacture = (String) map.getValue();
+                    if (manufacture.isBlank() || manufacture.isEmpty()||manufacture==null)
+                        throw new InvalidInputException("Product manufacture can't be null/empty");
+                    prod.setPManufacturer(manufacture);
+                    break;
+                case "pQuantity":
+                    Integer quantity = (Integer) map.getValue();
+                    if (quantity < 1 || quantity > 100)
+                        throw new InvalidInputException("Product quantity should be btw 1 and 100");
+                    prod.setPQuantity(quantity);
+                    break;
+            }
+        }
+        productRepository.saveAndFlush(prod);
 
         return "Product deleted!!";
 
+    }
+
+
+    public String deleteProductDetails(Integer productId) throws DataNotFoundExeception {
+        Product p = getProduct(productId);
+        productRepository.deleteById(p.getId());
+        return "Deleted Product";
     }
 
 }

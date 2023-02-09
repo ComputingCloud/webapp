@@ -12,6 +12,7 @@ import com.example.assignment1.model.UserUpdateRequestModel;
 import com.example.assignment1.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,12 +29,12 @@ public class UserService {
 		return new BCryptPasswordEncoder();
 	}
 
-	public String createUser(User user) throws UserExistException {
+	public User createUser(User user) throws UserExistException {
 		User userDto = userrepo.findByUsername(user.getUsername());
 		if (userDto == null) {
-			user.setPassword(encoder().encode(user.getPassword()));
+			user.setPassword(encoder().encode(user.getPassword()));//.encode(user.getPassword()));
 			userrepo.save(user);
-			return "Created User";
+			return user;
 		}
 		throw new UserExistException("User Exists Already");
 	}

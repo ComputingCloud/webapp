@@ -55,7 +55,7 @@ public class Product {
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="date_added")
-    private LocalDateTime dateAdded;
+    private LocalDateTime dateAdded;;;;;;;;;;
 
     @JsonProperty(value = "date_last_updated",access = JsonProperty.Access.READ_ONLY)
     @UpdateTimestamp
