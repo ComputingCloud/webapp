@@ -19,3 +19,5 @@ Added Product class too and linked with the UserInfo table
 passwords are crypted in order to protect it using BCrypt mvn test -Dtest='TestClassName'.
 
 select queries using , MysqlWorkbecnch to check the database and the table , table user js created when the sofwate is run
+
+Demo Test.
