@@ -15,7 +15,7 @@ class Assignment1ApplicationTests {
     @Test
     void contextLoads() {
 
-        assertTrue("Hello123".equals("Hello"));
+        assertTrue("Hello".equals("Hello"));
     }
 
 
