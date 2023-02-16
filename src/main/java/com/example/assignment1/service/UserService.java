@@ -29,12 +29,14 @@ public class UserService {
 		return new BCryptPasswordEncoder();
 	}
 
-	public User createUser(User user) throws UserExistException {
+	public UserDto createUser(User user) throws UserExistException {
 		User userDto = userrepo.findByUsername(user.getUsername());
 		if (userDto == null) {
 			user.setPassword(encoder().encode(user.getPassword()));//.encode(user.getPassword()));
 			userrepo.save(user);
-			return user;
+
+			UserDto dto = UserDto.getUserDto(user);
+			return dto;
 		}
 		throw new UserExistException("User Exists Already");
 	}
