@@ -47,7 +47,7 @@ public class Product {
     private String pManufacturer;
 
     @JsonProperty("pQuantity")
-    @Min(value = 1, message = "Quantity must be greater than 1" )
+    @Min(value = 0, message = "Quantity must be greater than 1" )
     @Max(value = 100, message = "Quantity must be less than 100")
     private int pQuantity;
 
