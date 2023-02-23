@@ -39,14 +39,14 @@ source "amazon-ebs" "my-ami" {
   ami_name        = "csye6225_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
   ami_description = " AMI for CSYE 6225"
   instance_type   = "t2.micro"
-  region          = "${var.aws_region}"
-  profile         = "${var.aws_profile}"
-  ssh_username    = "${var.ssh_username}"
-  subnet_id       = "${var.subnet_id}"
-  source_ami      = "${var.source_ami}"
-  access_key      = "AKIAVRDBMWOQ653QFJZ6"
-  secret_key      = "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"
-  ami_users       = "${var.ami_user}"
+  region          = var.aws_region
+  profile         = var.aws_profile
+  ssh_username    = var.ssh_username
+  subnet_id       = var.subnet_id
+  source_ami      = var.source_ami
+  access_key      = var.aws_access_key_id
+  secret_key      = var.aws_secret_access_key
+  ami_users       = var.ami_user
   ami_regions = [
     var.aws_region
   ]
