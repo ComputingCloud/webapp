@@ -1,6 +1,6 @@
-variable "aws_region" {
+variable "aws-region" {
   type    = string
-  default = "us-east-2"
+  default = "us-east-1"
 }
 
 variable "aws_profile" {
@@ -9,7 +9,7 @@ variable "aws_profile" {
 }
 variable "source_ami" {
   type    = string
-  default = "ami-0cc87e5027adcdca8"
+ default = "ami-0cc87e5027adcdca8"
 }
 
 variable "ssh_username" {
@@ -21,34 +21,34 @@ variable "subnet_id" {
   type    = string
   default = "subnet-04da4763825de3c2a"
 }
-variable "aws_access_key_id" {
+variable "aws-access-key-id" {
   type    = string
-  default = env("AWS_ACCESS_KEY_ID")
+  default = env("aws-access-key-id")
 }
 
-variable "aws_secret_access_key" {
+variable "aws-secret-access-key" {
   type    = string
-  default = env("AWS_SECRET_ACCESS_KEY")
+  default = env("aws-secret-access-key")
 }
 variable "ami_user" {
   type    = list(string)
-  default = ["883576441942"]
+  default = ["380308861857","883576441942"]
 }
 
 source "amazon-ebs" "my-ami" {
   ami_name        = "csye6225_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
   ami_description = " AMI for CSYE 6225"
   instance_type   = "t2.micro"
-  region          = "${var.aws_region}"
+  region          = "${var.aws-region}"
   profile         = "${var.aws_profile}"
   ssh_username    = "${var.ssh_username}"
   subnet_id       = "${var.subnet_id}"
   source_ami      = "${var.source_ami}"
-  access_key      = "AKIAVRDBMWOQ653QFJZ6"
-  secret_key      = "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"
+  access_key      = "${var.aws-access-key-id}"
+  secret_key      = "${var.aws-secret-access-key}"
   ami_users       = "${var.ami_user}"
   ami_regions = [
-    var.aws_region
+    var.aws-region
   ]
   aws_polling {
     delay_seconds = 120
@@ -86,7 +86,9 @@ build {
 
   provisioner "shell" {
     inline = [
+      "sudo chmod 770 /home/ec2-user/webapp-0.0.1-SNAPSHOT.jar",
       "sudo cp /tmp/webservice.service /etc/systemd/system",
+      "sudo chmod 770 /etc/systemd/system/webservice.service",
       "sudo systemctl start webservice.service",
       "sudo systemctl enable webservice.service",
       "sudo systemctl restart webservice.service",
