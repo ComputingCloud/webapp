@@ -37,5 +37,5 @@ jobs:
       - name: Packer build
         uses: ExitoLab/packer_build_action_aws@v0.2.10
         with:
-          templateFile: 'ami.pkr.hcl'
+          templateFile: 'main.pkr.hcl'
           workingDir: 'ami'
