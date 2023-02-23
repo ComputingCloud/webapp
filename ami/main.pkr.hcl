@@ -19,7 +19,7 @@ variable "ssh_username" {
 
 variable "subnet_id" {
   type    = string
-  default = "subnet-04da4763825de3c2a"
+  default = "subnet-06134cb266a7c71ae"
 }
 variable "aws-access-key-id" {
   type    = string
