@@ -35,7 +35,7 @@ jobs:
           cp stage/*.jar ami
           cd ami && ls -all
       - name: Packer build
-        uses: hashicorp/packer-github-actions@master
+        uses: ExitoLab/packer_build_action_aws@v0.2.10
         with:
           command: build
           arguments: "-color=false -on-error=abort"
