@@ -9,7 +9,7 @@ variable "aws_profile" {
 }
 variable "source_ami" {
   type    = string
- default = "ami-0cc87e5027adcdca8"
+ default = "ami-0dfcb1ef8550277af"
 }
 
 variable "ssh_username" {
