@@ -2,11 +2,14 @@ package com.example.assignment1.controller;
 
 
 import com.example.assignment1.constants.UserConstants;
+import com.example.assignment1.exeception.BadInputException;
 import com.example.assignment1.exeception.DataNotFoundExeception;
 import com.example.assignment1.exeception.InvalidInputException;
 import com.example.assignment1.exeception.UserAuthrizationExeception;
+import com.example.assignment1.model.Image;
 import com.example.assignment1.model.Product;
 import com.example.assignment1.service.AuthService;
+import com.example.assignment1.service.ImageService;
 import com.example.assignment1.service.ProductService;
 import com.example.assignment1.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +22,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -36,6 +40,9 @@ public class ProductController {
 
     @Autowired
     AuthService authService;
+
+    @Autowired
+    ImageService imageService;
 
     @RestControllerAdvice
     public class MyExceptionHandler {
@@ -170,6 +177,88 @@ public class ProductController {
             // TODO Auto-generated catch block
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
+            return new ResponseEntity<String>(UserConstants.InternalErr, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @PostMapping(value = "/{product_id}/image", produces = "application/json", consumes = "multipart/form-data")
+    public ResponseEntity<?> saveImage(@PathVariable("product_id") Integer productId, @RequestParam("file")MultipartFile file, HttpServletRequest request){
+        try {
+            if (productId.toString().isBlank() || productId.toString().isEmpty()) {
+                throw new InvalidInputException("Enter Valid Product Id");
+            }
+            Integer userId = productService.getProduct(productId).getOwnerUserId();
+            System.out.println(userId);
+            authService.isAuthorised(userId, request.getHeader("Authorization").split(" ")[1]);
+            return new ResponseEntity<Image>(imageService.saveImage(productId, userId, file), HttpStatus.CREATED);
+        } catch (InvalidInputException e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (UserAuthrizationExeception e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.FORBIDDEN);
+        } catch (DataNotFoundExeception e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            System.out.println(e);
+            return new ResponseEntity<String>(UserConstants.InternalErr, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(value = "/{product_id}/image", produces = "application/json")
+    public ResponseEntity<?> getAllImages(@PathVariable("product_id") Integer productId, HttpServletRequest request) {
+        try {
+            if (productId.toString().isBlank() || productId.toString().isEmpty()) {
+                throw new InvalidInputException("Enter Valid Product Id");
+            }
+            Integer userId = productService.getProduct(productId).getOwnerUserId();
+            System.out.println(userId);
+            authService.isAuthorised(userId, request.getHeader("Authorization").split(" ")[1]);
+            return new ResponseEntity<List<Image>>(imageService.getAllImages(productId, userId), HttpStatus.OK);
+        } catch (InvalidInputException e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (UserAuthrizationExeception e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.FORBIDDEN);
+        } catch (DataNotFoundExeception e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            System.out.println(e);
+            return new ResponseEntity<String>(UserConstants.InternalErr, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @GetMapping(value = "/{product_id}/image/{image_id}", produces = "application/json")
+    public ResponseEntity<?> getImage(@PathVariable("product_id") Integer productId,
+                                      @PathVariable("image_id") Integer imageId, HttpServletRequest request) {
+        try {
+            if (productId.toString().isBlank() || productId.toString().isEmpty() || imageId.toString().isBlank()
+                    || imageId.toString().isEmpty()) {
+                throw new InvalidInputException("Enter Valid Product Id / ImageId");
+            }
+            Integer userId = productService.getProduct(productId).getOwnerUserId();
+            System.out.println(userId);
+            authService.isAuthorised(userId, request.getHeader("Authorization").split(" ")[1]);
+            return new ResponseEntity<Image>(imageService.getImage(productId, userId, imageId), HttpStatus.OK);
+        } catch (UserAuthrizationExeception e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.FORBIDDEN);
+        } catch (InvalidInputException e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (BadInputException e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (DataNotFoundExeception e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            System.out.println(e);
             return new ResponseEntity<String>(UserConstants.InternalErr, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
