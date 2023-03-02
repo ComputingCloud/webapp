@@ -21,17 +21,21 @@ public class ProductService {
 
     @Autowired
     UserService userService;
+    @Autowired
+    ImageService imageService;
 
 
     public Product productCreate(Product product, String userName) throws UserAuthrizationExeception, InvalidInputException {
-        User userObj = userService.loadUserByUsername(userName);
-        if(userObj != null){
-            skuCheck(1, userObj.getId(), product.getSku(), "PostCheck");
-            product.setOwnerUserId(userObj.getId());
+        User userobj = userService.loadUserByUsername(userName);
+        if (userobj != null) {
+            skuCheck(1, userobj.getId(), product.getSku(), "PostCheck");
+            product.setOwnerUserId(userobj.getId());
             productRepository.saveAndFlush(product);
             return product;
         }
-        throw new UserAuthrizationExeception("Unauthorized Username, does not Exists");
+        // throw auth error
+        throw new UserAuthrizationExeception("UnAuthrized username dose not exists");
+
     }
 
     public Product skuCheck(Integer id,Integer ownerId,String sku,String check) throws InvalidInputException {
@@ -122,6 +126,8 @@ public class ProductService {
     public String deleteProductDetails(Integer productId) throws DataNotFoundExeception {
         Product p = getProduct(productId);
         productRepository.deleteById(p.getId());
+        imageService.deleteImageByProductId(productId, p.getOwnerUserId());
+
         return "Deleted Product";
     }
 
