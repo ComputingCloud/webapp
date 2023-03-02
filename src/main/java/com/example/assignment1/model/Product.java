@@ -26,33 +26,31 @@ public class Product {
             strategy = GenerationType.SEQUENCE,
             generator = "product_sequence"
     )
+
     @Column(nullable = false)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer id;
 
-    @JsonProperty("name")
-    @NotEmpty(message = "Product Name cannot be empty")
-    private String name;
+    @JsonProperty("pName")
+    @NotEmpty(message = "ProductName cannot be Null/Empty")
+    private String pName;
 
-    @JsonProperty("description")
-    @NotEmpty(message="Description cannot be empty")
-    private String description;
+    @JsonProperty("pDescription")
+    @NotEmpty(message = "Description cannot be Null/Empty")
+    private String pDescription;
 
     @JsonProperty("sku")
-    @NotEmpty(message="sku cannot be empty")
+    @NotEmpty(message = "Sku cannot be Null/Empty")
     private String sku;
 
+    @JsonProperty("pManufacturer")
+    @NotEmpty(message = "Manufacturer cannot be Empty/Null")
+    private String pManufacturer;
 
-    @JsonProperty("manufacturer")
-    @NotEmpty( message="manufacturer Name cannot be empty")
-    private String manufacturer;
-
-    @IntegerCheck
-    @NotNull( message="quantity cannot be empty")
-    @Min(value=0, message="Quantity must be greater than or equal to 1")
-    @Max(value=100, message="Quantity must be less than or equal to 100")
-    private Integer quantity;
-
+    @JsonProperty("pQuantity")
+    @Min(value = 0, message = "Quantity must be greater than 1" )
+    @Max(value = 100, message = "Quantity must be less than 100")
+    private Integer pQuantity;
 
     @JsonProperty(value ="date_added",access = JsonProperty.Access.READ_ONLY)
     @CreationTimestamp
@@ -60,15 +58,15 @@ public class Product {
     @Column(name="date_added")
     private LocalDateTime dateAdded;
 
-    @JsonProperty(value = "date_last_updated",access = JsonProperty.Access.READ_ONLY)
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="date_last_updated")
-    private LocalDateTime dateLastUpdated;
-
     @JsonProperty(value="owner_user_id",access = JsonProperty.Access.READ_ONLY)
     @Column(name="owner_user_id")
     private Integer ownerUserId;
 
+
+    @JsonProperty(value = "date_last_updated",access = JsonProperty.Access.READ_ONLY)
+ @UpdateTimestamp
+ @Temporal(TemporalType.TIMESTAMP)
+@Column(name="date_last_updated")
+private LocalDateTime dateLastUpdated;
 
 }
