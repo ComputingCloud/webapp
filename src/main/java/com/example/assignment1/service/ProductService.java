@@ -56,21 +56,18 @@ public class ProductService {
     }
 
 
-    public String updateProduct(Integer productId, Product product) throws DataNotFoundExeception{
+    public String updateProduct(Integer productId, Product product) throws DataNotFoundExeception, InvalidInputException {
 
-        Product prod = getProduct(productId);
-
-        prod.setId(productId);
-        prod.setPName(product.getPName());
-        prod.setPDescription(product.getPDescription());
-        prod.setPQuantity(product.getPQuantity());
-
-        prod.setSku(product.getSku());
-        prod.setPManufacturer(product.getPManufacturer());
-
-        productRepository.saveAndFlush(prod);      // flushes the data immediately during the execution
-
-        return "Details of the product updated";
+        Product p = getProduct(productId);
+        skuCheck(p.getId(), p.getOwnerUserId(), product.getSku(), "PutCheck");
+        p.setId(productId);
+        p.setPName(product.getPName());
+        p.setPDescription(product.getPDescription());
+        p.setSku(product.getSku());
+        p.setPManufacturer(product.getPManufacturer());
+        p.setPQuantity(product.getPQuantity());
+        productRepository.saveAndFlush(p);
+        return "Updated Product Details";
     }
 
     public String patchProducts(Integer productId, Map<String,Object> updates) throws DataNotFoundExeception, InvalidInputException {
