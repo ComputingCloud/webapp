@@ -57,13 +57,13 @@ public class ProductController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> productCreate(@Valid @RequestBody Product product, Errors error, HttpServletRequest request) {
+    public ResponseEntity<?> productCreate(@Valid @RequestBody Product product, HttpServletRequest request) {
         try {
-            if (error.hasErrors()) {
-                String response = error.getAllErrors().stream().map(ObjectError::getDefaultMessage)
-                        .collect(Collectors.joining(","));
-                throw new InvalidInputException(response);
-            }
+//            if (error.hasErrors()) {
+//                String response = error.getAllErrors().stream().map(ObjectError::getDefaultMessage)
+//                        .collect(Collectors.joining(","));
+//                throw new InvalidInputException(response);
+//            }
 
             return new ResponseEntity<Product>(
                     productService.productCreate(product,
