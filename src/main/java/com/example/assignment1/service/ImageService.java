@@ -2,10 +2,10 @@ package com.example.assignment1.service;
 
 import com.example.assignment1.exeception.BadInputException;
 import com.example.assignment1.exeception.DataNotFoundExeception;
-import com.example.assignment1.model.BucketName;
 import com.example.assignment1.model.Image;
 import com.example.assignment1.repository.ImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +25,9 @@ public class ImageService {
     @Autowired
     private ImageRepository imageRepository;
 
+    @Value("${aws.s3.bucketName}")
+    private String bucketName;
+
     public Image saveImage(Integer productId, Integer userId, MultipartFile file) {
         // check if the file is empty
         if (file.isEmpty()) {
@@ -43,7 +46,7 @@ public class ImageService {
         metadata.put("Content-Type", file.getContentType());
         metadata.put("Content-Length", String.valueOf(file.getSize()));
         // Save Image in S3 and then save Todo in the database
-        String path = String.format("%s/%s/%s", BucketName.TODO_IMAGE.getBucketName(), userId, productId);
+        String path = String.format("%s/%s/%s", bucketName, userId, productId);
         String fileName = String.format("%s", file.getOriginalFilename());
         System.out.println(path+" "+fileName);
         try {
@@ -75,15 +78,24 @@ public class ImageService {
         return imgObj.get();
     }
 
-//	public Image deleteImage(Integer productId, Integer userId, Integer imageId)  throws DataNotFoundExeception, BadInputException {
-//		// TODO Auto-generated method stub
-//		Optional<Image> imgObj=imageRepository.findById(imageId);
-//		if(imgObj.isEmpty())
-//			throw new DataNotFoundExeception("No Image with given Id");
-//		System.out.println(imgObj.get().getProductId()+" "+productId);
-//		if(imgObj.get().getProductId()!=productId)
-//			throw new BadInputException("ProductId and imageId won't match");
-//
-//	}
+	public Image deleteImage(Integer productId, Integer userId, Integer imageId)  throws DataNotFoundExeception, BadInputException {
+		// TODO Auto-generated method stub
+		Optional<Image> imgObj=imageRepository.findById(imageId);
+		if(imgObj.isEmpty())
+			throw new DataNotFoundExeception("No Image with given Id");
+		System.out.println(imgObj.get().getProductId()+" "+productId);
+		if(imgObj.get().getProductId()!=productId)
+			throw new BadInputException("ProductId and imageId won't match");
+        String path = String.format("%s/%s/%s", bucketName, userId, productId);
+        fileStore.deleteFile(path,imgObj.get().getFileName());
+        return imgObj.get();
+	}
+
+    public void deleteImageByProductId(Integer productId, Integer userId)  throws DataNotFoundExeception {
+        // TODO Auto-generated method stub
+//		System.out.println(imgObj.get().getS3BucketPath()+" "+imgObj.get().getFileName());
+        String path = String.format("%s/%s/%s", bucketName, userId, productId);
+        fileStore.deleteFile(path,"/");
+    }
 
 }

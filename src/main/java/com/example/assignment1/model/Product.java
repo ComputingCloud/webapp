@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -27,35 +28,37 @@ public class Product {
     )
     @Column(nullable = false)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private int id;
+    private Integer id;
 
-    @JsonProperty("pName")
-    @NotEmpty(message = "ProductName cannot be Null/Empty")
-    private String pName;
+    @JsonProperty("name")
+    @NotEmpty(message = "Product Name cannot be empty")
+    private String name;
 
-
-    @JsonProperty("pDescription")
-    @NotEmpty(message = "Description cannot be Null/Empty")
-    private String pDescription;
+    @JsonProperty("description")
+    @NotEmpty(message="Description cannot be empty")
+    private String description;
 
     @JsonProperty("sku")
-    @NotEmpty(message = "Sku cannot be Null/Empty")
+    @NotEmpty(message="sku cannot be empty")
     private String sku;
 
-    @JsonProperty("pManufacturer")
-    @NotEmpty(message = "Manufacturer cannot be Empty/Null")
-    private String pManufacturer;
 
-    @JsonProperty("pQuantity")
-    @Min(value = 0, message = "Quantity must be greater than 1" )
-    @Max(value = 100, message = "Quantity must be less than 100")
-    private int pQuantity;
+    @JsonProperty("manufacturer")
+    @NotEmpty( message="manufacturer Name cannot be empty")
+    private String manufacturer;
+
+    @IntegerCheck
+    @NotNull( message="quantity cannot be empty")
+    @Min(value=0, message="Quantity must be greater than or equal to 1")
+    @Max(value=100, message="Quantity must be less than or equal to 100")
+    private Integer quantity;
+
 
     @JsonProperty(value ="date_added",access = JsonProperty.Access.READ_ONLY)
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="date_added")
-    private LocalDateTime dateAdded;;;;;;;;;;
+    private LocalDateTime dateAdded;
 
     @JsonProperty(value = "date_last_updated",access = JsonProperty.Access.READ_ONLY)
     @UpdateTimestamp
@@ -65,7 +68,7 @@ public class Product {
 
     @JsonProperty(value="owner_user_id",access = JsonProperty.Access.READ_ONLY)
     @Column(name="owner_user_id")
-    private int ownerUserId;
+    private Integer ownerUserId;
 
 
 }

@@ -263,4 +263,35 @@ public class ProductController {
         }
     }
 
+
+    @DeleteMapping(value = "/{product_id}/image/{image_id}", produces = "application/json")
+    public ResponseEntity<?> deleteImage(@PathVariable("product_id") Integer productId,
+                                         @PathVariable("image_id") Integer imageId, HttpServletRequest request) {
+        try {
+            if (productId.toString().isBlank() || productId.toString().isEmpty() || imageId.toString().isBlank()
+                    || imageId.toString().isEmpty()) {
+                throw new InvalidInputException("Enter Valid Product Id / ImageId");
+            }
+            Integer userId = productService.getProduct(productId).getOwnerUserId();
+            System.out.println(userId);
+            authService.isAuthorised(userId, request.getHeader("Authorization").split(" ")[1]);
+            return new ResponseEntity<Image>(imageService.deleteImage(productId, userId, imageId), HttpStatus.NO_CONTENT);
+        } catch (UserAuthrizationExeception e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.FORBIDDEN);
+        } catch (InvalidInputException e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (BadInputException e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (DataNotFoundExeception e) {
+            // TODO Auto-generated catch block
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            System.out.println(e);
+            return new ResponseEntity<String>(UserConstants.InternalErr, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     }

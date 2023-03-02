@@ -1,5 +1,6 @@
 package com.example.assignment1.service;
 
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -47,6 +48,15 @@ public class FileStore {
             return IOUtils.toByteArray(objectContent);
         } catch (AmazonServiceException | IOException e) {
             throw new IllegalStateException("Failed to download the file", e);
+        }
+    }
+
+    public void deleteFile(String bucketName,String keyName) {
+        try {
+            amazonS3.deleteObject(new DeleteObjectRequest(bucketName, keyName));
+        } catch(AmazonServiceException e) {
+            System.out.println(e);
+            throw new IllegalStateException("Failed to delete the file", e);
         }
     }
 
