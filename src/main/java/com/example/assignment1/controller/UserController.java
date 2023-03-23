@@ -12,8 +12,11 @@ import com.example.assignment1.model.UserDto;
 import com.example.assignment1.model.UserUpdateRequestModel;
 import com.example.assignment1.service.AuthService;
 import com.example.assignment1.service.UserService;
+import com.timgroup.statsd.StatsDClient;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,11 +41,18 @@ public class UserController {
 	
 	@Autowired
 	AuthService authService;
-	
-	
-    @GetMapping(value = "/user/{userId}")
+
+	@Autowired
+	StatsDClient statsDClient;
+	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+
+	@GetMapping(value = "/user/{userId}")
     public ResponseEntity<?> getUserDetails(@PathVariable("userId") Integer userId, HttpServletRequest request){
     	try {
+
+			logger.info("This is User Post method for User: ");
+			statsDClient.incrementCounter("endpoint.getUserDetails.http.get");
     		if(userId.toString().isBlank()||userId.toString().isEmpty()) {
             	throw new InvalidInputException("Enter Valid User Id");
             }
@@ -69,7 +79,13 @@ public class UserController {
     @PutMapping(value = "/user/{userId}")
     public ResponseEntity<?> updateUserDetails(@PathVariable("userId") Integer userId, @Valid @RequestBody UserUpdateRequestModel user,
     		HttpServletRequest request,Errors error){
+
+
     	try {
+
+			logger.info("This is User Put method for User: ");
+			statsDClient.incrementCounter("endpoint.updateUserDetails.http.put");
+
     		if(userId.toString().isBlank() || userId.toString().isEmpty()) {
             	throw new InvalidInputException("Enter Valid User Id");
             }
@@ -101,7 +117,12 @@ public class UserController {
     
     @PostMapping("/user")
     public ResponseEntity<?> createUser(@Valid @RequestBody User user, Errors error){
-    	try {
+
+		//logger.info("This is User Post method for User: "+ user.getId());
+		logger.info("This is User Post method for User: "+user.getId());
+		statsDClient.incrementCounter("endpoint.createUser.http.post");
+
+		try {
     		if(error.hasErrors()) {
     			String response = error.getAllErrors().stream().map(ObjectError::getDefaultMessage)
     					.collect(Collectors.joining(","));
