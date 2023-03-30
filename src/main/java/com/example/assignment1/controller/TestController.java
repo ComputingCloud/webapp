@@ -20,7 +20,7 @@ public class TestController {
 	@Autowired
 	StatsDClient statsDClient;
 
-	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+	private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 	@GetMapping()
 	public ResponseEntity<?> getHealth() {
 		logger.info("This is Testing Get method for Checking Healthz ");

@@ -50,7 +50,7 @@ public class ProductController {
     @Autowired
     StatsDClient statsDClient;
 
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     @RestControllerAdvice
     public class MyExceptionHandler {

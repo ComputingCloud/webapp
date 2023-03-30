@@ -119,15 +119,18 @@ public class UserController {
     public ResponseEntity<?> createUser(@Valid @RequestBody User user, Errors error){
 
 		//logger.info("This is User Post method for User: "+ user.getId());
-		logger.info("This is User Post method for User: "+user.getId());
-		statsDClient.incrementCounter("endpoint.createUser.http.post");
+
 
 		try {
+
+
     		if(error.hasErrors()) {
     			String response = error.getAllErrors().stream().map(ObjectError::getDefaultMessage)
     					.collect(Collectors.joining(","));
     			throw new InvalidInputException(response);
     		}
+			logger.info("This is User Post method for User: "+user.getId());
+			statsDClient.incrementCounter("endpoint.createUser.http.post");
 			return new ResponseEntity<UserDto>( userService.createUser(user), HttpStatus.CREATED);
 		} catch (InvalidInputException e) {
 			// TODO Auto-generated catch block
