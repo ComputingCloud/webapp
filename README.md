@@ -20,4 +20,6 @@ passwords are crypted in order to protect it using BCrypt mvn test -Dtest='TestC
 
 select queries using , MysqlWorkbecnch to check the database and the table , table user js created when the sofwate is run
 
-Demo Assignment-05
+Query to Import SSL Certificate- 
+aws acm import-certificate --certificate fileb:///Users/jatin/Downloads/demo_jatincp.me/demo_jatincp_me.crt --certificate-chain fileb:///Users/jatin/Downloads/demo_jatincp.me/demo_jatincp_me.ca-bundle --private-key
+fileb:///Users/jatin/Downloads/demo_jatincp.me/private.pem --profile demo
