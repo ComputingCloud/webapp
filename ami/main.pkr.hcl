@@ -88,6 +88,11 @@ build {
     destination = "/tmp/"
   }
 
+  post-processor "manifest"{
+    output = "manifest.json"
+    strip_path = true
+  }
+
 #  provisioner "file" {
 #    source      = "webapp-0.0.1-SNAPSHOT.jar"
 #    destination = "webapp-0.0.1-SNAPSHOT.jar"
