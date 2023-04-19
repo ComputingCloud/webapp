@@ -23,3 +23,8 @@ select queries using , MysqlWorkbecnch to check the database and the table , tab
 Query to Import SSL Certificate- 
 aws acm import-certificate --certificate fileb:///Users/jatin/Downloads/demo_jatincp.me/demo_jatincp_me.crt --certificate-chain fileb:///Users/jatin/Downloads/demo_jatincp.me/demo_jatincp_me.ca-bundle --private-key
 fileb:///Users/jatin/Downloads/demo_jatincp.me/private.pem --profile demo
+
+
+
+
+tppp
