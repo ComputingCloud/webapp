@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController()
-@RequestMapping("v1/product")
+@RequestMapping("v3/product")
 public class ProductController {
 
     @Autowired
